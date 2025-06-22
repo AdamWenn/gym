@@ -19,7 +19,7 @@ To get started with the Smart Workout Tracker, you can clone this repository and
 
 1. **Launch Safari and Visit Your App's URL:**
    - Open the Safari browser on your iPhone.
-   - Navigate to the URL where your Smart Workout Tracker is hosted (e.g., `https://your-username.github.io/your-repo-name/`).
+   - Navigate to the URL (e.g., `https://adamwenn.github.io/gym/`).
 
 2. **Tap the Share Button:**
    - Once the app has loaded, look for the Share button at the bottom of your Safari screen. It looks like a square with an arrow pointing upwards.
