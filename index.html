@@ -12,6 +12,8 @@
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Remove the tap highlight on iOS for a more native app feel */
+            -webkit-tap-highlight-color: transparent; 
         }
         
         body {
@@ -169,6 +171,8 @@
             justify-content: center;
             gap: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            /* Also remove outline for focus states */
+            outline: none; 
         }
         
         button i {
@@ -257,6 +261,8 @@
             cursor: pointer;
             transition: background 0.3s;
             font-weight: 600;
+            /* Remove the tap highlight on iOS */
+            -webkit-tap-highlight-color: transparent; 
         }
         
         .tab.active {
@@ -395,10 +401,10 @@
             color: white;
             font-size: 1.1rem;
             margin-bottom: 20px;
+            outline: none; /* Remove outline on focus */
         }
         
         #exerciseModalInput:focus {
-            outline: none;
             box-shadow: 0 0 0 2px #ff7e5f;
         }
         
@@ -415,6 +421,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
+            outline: none; /* Remove outline on focus */
         }
         
         #confirmExercise {
@@ -443,6 +450,7 @@
             font-size: 0.9rem;
             cursor: pointer;
             transition: background 0.3s;
+            outline: none; /* Remove outline on focus */
         }
         
         .suggestion:hover {
@@ -544,7 +552,7 @@
         </div>
         
         <div class="tabs">
-            <div class="tab active" data-tab="today">Current</div>
+            <div class="tab active" data-tab="today">Today</div>
             <div class="tab" data-tab="history">History</div>
             <div class="tab" data-tab="stats">Statistics</div>
         </div>
