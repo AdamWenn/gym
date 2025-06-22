@@ -15,17 +15,24 @@ To get started with the Smart Workout Tracker, you can clone this repository and
 
 - Ensure you have Safari installed on your iPhone as this feature is specific to Safari.
 
-### Installation
+### Instructions:
 
-1. **Clone the Repository:**
-   - Open your terminal and run the following command to clone the repository:
-     ```bash
-     git clone https://github.com/your-username/your-repo-name.git
-     ```
+1. **Launch Safari and Visit Your App's URL:**
+   - Open the Safari browser on your iPhone.
+   - Navigate to the URL where your Smart Workout Tracker is hosted (e.g., `https://your-username.github.io/your-repo-name/`).
 
-2. **Open the Application in Safari:**
-   - Navigate to the directory where you cloned the repository and open the application in Safari on your iPhone.
-   - Alternatively, you can directly visit the hosted URL of the application in Safari (e.g., `https://your-username.github.io/your-repo-name/`).
+2. **Tap the Share Button:**
+   - Once the app has loaded, look for the Share button at the bottom of your Safari screen. It looks like a square with an arrow pointing upwards.
 
-3. **Add to Home Screen:**
-   - Follow the step-by-step guide below to add the Smart Workout Tracker to your iPhone's home screen.
+3. **Find "Add to Home Screen":**
+   - A menu will slide up from the bottom of your screen. Scroll down through the options until you see "Add to Home Screen." It has a small plus sign icon.
+
+4. **Name Your Shortcut (Optional):**
+   - A new screen will appear, showing the app's icon and a default name (likely "Smart Workout Tracker"). You can tap the name to change it to something shorter or more personal, like "My Workouts" or "Gym Tracker."
+
+5. **Tap "Add":**
+   - Once you're satisfied with the name, tap the "Add" button in the top-right corner of the screen.
+
+### You're Done!
+
+The Smart Workout Tracker icon will now appear on your iPhone's home screen. Tap it to launch your workout tracker in a full-screen, browser-less mode, just like a native app!
