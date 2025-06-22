@@ -675,9 +675,9 @@
     <div id="addToHomeScreenPrompt" class="full-screen-overlay">
         <div class="modal-content">
             <p>For an app-like experience, add this to your Home Screen!</p>
-            <p>Tap the Share Button <span class="icon-container"><img src="https://thumb.ac-illust.com/bc/bc49b1d171927615464be1e25147fd2a_t.jpeg" alt="Share icon"></span> below and select "Add to Home Screen" <span class="icon-container"><img src="https://retaileducation.lancome.com/beautyicons/imgs/share.svg" alt="Add to Home Screen icon"></span>.</p>
-            <p>A new screen will appear, showing the app's icon and a default name (likely "Smart Workout Tracker").</p>
-            <button id="dismissPromptBtn" style="background: linear-gradient(to right, #feb47b, #ff7e5f);">Got It!</button>
+            <p>Tap the Share Button <span class="icon-container"><img src="https://placehold.co/30x30/000000/FFFFFF?text=%E2%86%91%EF%B8%8F" alt="Share icon"></span> below and select "Add to Home Screen" <span class="icon-container"><img src="https://placehold.co/30x30/000000/FFFFFF?text=%2B" alt="Add to Home Screen icon"></span>.</p>
+            <p id="addToHomeScreenPromptMessage">You'll be reminded again in 30 seconds.</p>
+            <button id="dismissPromptBtn" style="background: linear-gradient(to right, #feb47b, #ff7e5f);">Remind Me Later</button>
         </div>
     </div>
 
@@ -717,8 +717,7 @@
         const setsContainer = document.getElementById('setsContainer');
         const tabs = document.querySelectorAll('.tab');
         const contents = document.querySelectorAll('.content');
-        // Renamed from todayWorkout to currentWorkoutDisplay for consistency
-        const currentWorkoutDisplay = document.getElementById('currentWorkoutDisplay'); 
+        const currentWorkoutDisplay = document.getElementById('currentContent'); 
         const historyList = document.getElementById('historyList');
         const statisticsContent = document.getElementById('statisticsContent');
         const exerciseModal = document.getElementById('exerciseModal');
@@ -730,8 +729,9 @@
         const dismissPromptBtn = document.getElementById('dismissPromptBtn');
         const openInSafariPrompt = document.getElementById('openInSafariPrompt');
         const dismissSafariPromptBtn = document.getElementById('dismissSafariPromptBtn');
-        const nonIosPrompt = document.getElementById('nonIosPrompt'); // New element
-        const dismissNonIosPromptBtn = document.getElementById('dismissNonIosPromptBtn'); // New button
+        const nonIosPrompt = document.getElementById('nonIosPrompt');
+        const dismissNonIosPromptBtn = document.getElementById('dismissNonIosPromptBtn');
+        const addToHomeScreenPromptMessage = document.getElementById('addToHomeScreenPromptMessage');
         
         // State variables
         let timer = null; // For set timer
@@ -791,7 +791,7 @@
             });
 
             // "Add to Home Screen" prompt dismissal
-            dismissPromptBtn.addEventListener('click', dismissAddToHomeScreenPrompt);
+            dismissPromptBtn.addEventListener('click', handleAddToHomeScreenDismissal); // Changed to new handler
             // "Open in Safari" prompt dismissal
             dismissSafariPromptBtn.addEventListener('click', dismissOpenInSafariPrompt);
             // New: "Non-iOS" prompt dismissal
@@ -1293,7 +1293,7 @@
             });
         }
 
-        // Updates the 'Current Workout' tab display (renamed from updateTodayWorkoutDisplay)
+        // Updates the 'Current Workout' tab display
         function updateCurrentWorkoutDisplay() {
             currentWorkoutDisplay.innerHTML = ''; // Clear current workout display
 
@@ -1513,7 +1513,6 @@
             contents.forEach(content => content.classList.remove('active')); // Hide all content
             
             document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active'); // Activate clicked tab
-            // Fixed: changed id from todayContent to currentContent
             document.getElementById(`${tabName}Content`).classList.add('active'); // Show corresponding content
             
             // Update content dynamically based on selected tab
@@ -1521,7 +1520,7 @@
                 updateHistoryDisplay();
             } else if (tabName === 'stats') {
                 updateStatsDisplay();
-            } else if (tabName === 'current') { /* Fixed: Changed 'today' to 'current' */
+            } else if (tabName === 'current') {
                 updateCurrentWorkoutDisplay();
             }
         }
@@ -1545,46 +1544,84 @@
 
         // Show the "Add to Home Screen" prompt
         function showAddToHomeScreenPrompt() {
-            // Check if the user has dismissed it before
-            const dismissed = localStorage.getItem('addToHomeScreenDismissed');
-            if (!dismissed) {
-                addToHomeScreenPrompt.classList.add('show'); // Use class to show/hide with transitions
+            // Check if the user has previously dismissed it permanently
+            const permanentDismissed = localStorage.getItem('addToHomeScreenPermanentDismissed');
+            if (permanentDismissed === 'true') {
+                return; // Do not show if permanently dismissed
             }
+
+            // Check if a reminder is pending
+            const nextReminderTimestamp = localStorage.getItem('nextAddToHomeScreenReminderTimestamp');
+            const currentTime = Date.now();
+
+            if (nextReminderTimestamp && currentTime < parseInt(nextReminderTimestamp)) {
+                // Not time to remind yet
+                return;
+            }
+
+            // Determine dismissal count for message
+            const dismissalCount = parseInt(localStorage.getItem('addToHomeScreenDismissalCount') || '0');
+            if (dismissalCount === 0) {
+                addToHomeScreenPromptMessage.textContent = "You'll be reminded again in 30 seconds.";
+            } else if (dismissalCount === 1) {
+                addToHomeScreenPromptMessage.textContent = "You'll be reminded again in 30 minutes.";
+            } else {
+                addToHomeScreenPromptMessage.textContent = "Last chance to add to Home Screen for a better experience!";
+                dismissPromptBtn.textContent = "Don't Remind Me Again"; // Change button text for permanent dismissal
+            }
+
+            addToHomeScreenPrompt.classList.add('show');
         }
 
-        // Dismiss the "Add to Home Screen" prompt and remember the choice
-        function dismissAddToHomeScreenPrompt() {
+        // Handle dismissal for "Add to Home Screen" prompt
+        function handleAddToHomeScreenDismissal() {
+            const dismissalCount = parseInt(localStorage.getItem('addToHomeScreenDismissalCount') || '0');
+            let newDismissalCount = dismissalCount + 1;
+            let nextReminderTime = Date.now();
+
+            if (newDismissalCount === 1) {
+                // First dismissal: Remind in 30 seconds
+                nextReminderTime += 30 * 1000; // 30 seconds
+            } else if (newDismissalCount === 2) {
+                // Second dismissal: Remind in 30 minutes
+                nextReminderTime += 30 * 60 * 1000; // 30 minutes
+            } else {
+                // Third or more dismissal: Permanent dismissal (very distant future)
+                nextReminderTime = Date.now() + (10 * 365 * 24 * 60 * 60 * 1000); // 10 years
+                localStorage.setItem('addToHomeScreenPermanentDismissed', 'true');
+            }
+            
+            localStorage.setItem('addToHomeScreenDismissalCount', newDismissalCount.toString());
+            localStorage.setItem('nextAddToHomeScreenReminderTimestamp', nextReminderTime.toString());
             addToHomeScreenPrompt.classList.remove('show');
-            localStorage.setItem('addToHomeScreenDismissed', 'true'); // Remember user preference
         }
 
         // Show the "Open in Safari" prompt
         function showOpenInSafariPrompt() {
-            // Check if the user has dismissed it before
             const dismissed = localStorage.getItem('openInSafariDismissed');
             if (!dismissed) {
-                 openInSafariPrompt.classList.add('show'); // Use class to show/hide with transitions
+                 openInSafariPrompt.classList.add('show');
             }
         }
 
         // Dismiss the "Open in Safari" prompt and remember the choice
         function dismissOpenInSafariPrompt() {
             openInSafariPrompt.classList.remove('show');
-            localStorage.setItem('openInSafariDismissed', 'true'); // Remember user preference
+            localStorage.setItem('openInSafariDismissed', 'true');
         }
 
         // New: Show the "Non-iOS" prompt
         function showNonIosPrompt() {
             const dismissed = localStorage.getItem('nonIosPromptDismissed');
             if (!dismissed) {
-                nonIosPrompt.classList.add('show'); // Use class to show/hide with transitions
+                nonIosPrompt.classList.add('show');
             }
         }
 
         // New: Dismiss the "Non-iOS" prompt and remember the choice
         function dismissNonIosPrompt() {
             nonIosPrompt.classList.remove('show');
-            localStorage.setItem('nonIosPromptDismissed', 'true'); // Remember user preference
+            localStorage.setItem('nonIosPromptDismissed', 'true');
         }
 
         // Main function to check browser and display appropriate prompt
