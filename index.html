@@ -91,16 +91,17 @@
             margin-top: 10px;
         }
         
-        /* Fixed: Adjust position of timer-state to prevent overlap */
+        /* Fixed: Adjusted position of timer-state to prevent overlap */
         .timer-state {
             position: absolute;
-            top: 10px; /* Adjusted from 15px */
-            right: 15px; /* Adjusted from 20px */
-            font-size: 0.8rem; /* Slightly reduced font size */
+            top: 5px; /* Adjusted to be closer to the top edge */
+            right: 5px; /* Adjusted to be closer to the right edge */
+            font-size: 0.75rem; /* Slightly reduced font size */
             background: rgba(255, 255, 255, 0.1);
             padding: 3px 8px; /* Reduced padding */
             border-radius: 15px; /* Adjusted border-radius */
             color: #ffb347;
+            white-space: nowrap; /* Prevent text from wrapping */
         }
         
         .progress-container {
@@ -499,120 +500,65 @@
             }
         }
 
-        /* Add to Home Screen Prompt Specific Styles */
-        #addToHomeScreenPrompt {
-            display: none; /* Hidden by default */
+        /* Full-screen overlay for prompts - makes them "invasive" */
+        .full-screen-overlay {
             position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85); /* Darker, more invasive background */
+            z-index: 2000; /* Higher than other modals */
+            display: flex; /* Use flexbox to center content */
+            justify-content: center;
+            align-items: center;
+            /* Ensure it's hidden by default and only shown by JS */
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.3s linear;
+        }
+
+        .full-screen-overlay.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .full-screen-overlay .modal-content {
+            background: rgba(20, 25, 45, 0.98); /* Slightly more opaque background */
+            border-radius: 20px;
+            padding: 30px; /* Increased padding */
             width: 90%;
-            max-width: 350px;
-            background: rgba(30, 40, 70, 0.98);
-            border-radius: 15px;
-            padding: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6);
-            color: white;
+            max-width: 450px; /* Slightly wider */
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
             text-align: center;
-            font-size: 0.95rem;
-            z-index: 1000; /* Ensure it's on top */
-            animation: slideInUp 0.5s ease-out;
-            box-sizing: border-box; /* Include padding in width calculation */
         }
 
-        #addToHomeScreenPrompt p {
-            margin-bottom: 10px;
-            line-height: 1.4;
-        }
-
-        #addToHomeScreenPrompt .icon-container {
-            margin-bottom: 10px;
-        }
-
-        #addToHomeScreenPrompt .icon-container img {
+        /* Prompt specific image sizing for icons */
+        .full-screen-overlay .icon-container img {
             width: 30px; /* Adjust size as needed */
             height: 30px;
             vertical-align: middle;
             margin: 0 5px;
         }
 
-        #addToHomeScreenPrompt button {
-            background: linear-gradient(to right, #feb47b, #ff7e5f);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            border: none;
-            font-weight: 600;
-            width: auto;
-            display: inline-block;
-            margin-top: 5px;
-        }
-
-        #addToHomeScreenPrompt button:hover {
-            opacity: 0.9;
-        }
-
-        /* "Open in Safari" Prompt Specific Styles */
-        #openInSafariPrompt {
-            display: none; /* Hidden by default */
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 90%;
-            max-width: 350px;
-            background: rgba(30, 40, 70, 0.98);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6);
-            color: white;
-            text-align: center;
-            font-size: 1rem;
-            z-index: 1001; /* Higher z-index than add to home screen prompt */
-            box-sizing: border-box;
-        }
-
-        #openInSafariPrompt h3 {
-            margin-bottom: 15px;
-            color: #ffb347;
-            font-size: 1.3rem;
-        }
-
-        #openInSafariPrompt p {
-            margin-bottom: 15px;
-            line-height: 1.5;
-        }
-
-        #openInSafariPrompt a {
-            color: #feb47b;
-            text-decoration: underline;
-        }
-
-        #openInSafariPrompt button {
-            background: linear-gradient(to right, #4A00E0, #8E2DE2);
-            color: white;
+        .full-screen-overlay button {
+            /* Override general button styles for prompt buttons if needed */
+            margin-top: 15px;
             padding: 10px 20px;
             border-radius: 10px;
-            cursor: pointer;
-            border: none;
-            font-weight: 600;
+            font-size: 1rem;
             width: auto;
-            margin-top: 10px;
+            display: inline-block;
         }
 
-        #openInSafariPrompt button:hover {
-            opacity: 0.9;
-        }
-
-        /* Keyframe for sliding up animation */
+        /* Keyframe for sliding up animation (if still desired for initial appearance) */
         @keyframes slideInUp {
             from {
-                transform: translateX(-50%) translateY(100%);
+                transform: translate(-50%, 100%);
                 opacity: 0;
             }
             to {
-                transform: translateX(-50%) translateY(0);
+                transform: translate(-50%, 0);
                 opacity: 1;
             }
         }
@@ -726,18 +672,32 @@
     </div>
 
     <!-- Add to Home Screen Prompt -->
-    <div id="addToHomeScreenPrompt">
-        <p>For an app-like experience, add this to your Home Screen!</p>
-        <p>Tap the <span class="icon-container"><img src="https://placehold.co/30x30/FFFFFF/000000?text=%E2%86%91%EF%B8%8F" alt="Share icon"></span> button below and select "<span class="icon-container"><img src="https://placehold.co/30x30/FFFFFF/000000?text=%2B" alt="Add to Home Screen icon"></span> Add to Home Screen".</p>
-        <button id="dismissPromptBtn">Got It!</button>
+    <div id="addToHomeScreenPrompt" class="full-screen-overlay">
+        <div class="modal-content">
+            <p>For an app-like experience, add this to your Home Screen!</p>
+            <p>Tap the <span class="icon-container"><img src="https://placehold.co/30x30/000000/FFFFFF?text=%E2%86%91%EF%B8%8F" alt="Share icon"></span> button below and select "<span class="icon-container"><img src="https://placehold.co/30x30/000000/FFFFFF?text=%2B" alt="Add to Home Screen icon"></span> Add to Home Screen".</p>
+            <button id="dismissPromptBtn" style="background: linear-gradient(to right, #feb47b, #ff7e5f);">Got It!</button>
+        </div>
     </div>
 
     <!-- Open in Safari Prompt -->
-    <div id="openInSafariPrompt">
-        <h3>Optimal Experience in Safari</h3>
-        <p>For the best app-like experience on your iPhone, please open this workout tracker in **Safari**.</p>
-        <p>Copy this link and paste it into Safari, or try using your current browser's "Open in Safari" option.</p>
-        <button id="dismissSafariPromptBtn">Understood</button>
+    <div id="openInSafariPrompt" class="full-screen-overlay">
+        <div class="modal-content">
+            <h3>Optimal Experience in Safari</h3>
+            <p>For the best app-like experience on your iPhone, please open this workout tracker in **Safari**.</p>
+            <p>Copy this link and paste it into Safari, or try using your current browser's "Open in Safari" option.</p>
+            <button id="dismissSafariPromptBtn" style="background: linear-gradient(to right, #4A00E0, #8E2DE2);">Understood</button>
+        </div>
+    </div>
+
+    <!-- Non-iOS Device Prompt -->
+    <div id="nonIosPrompt" class="full-screen-overlay">
+        <div class="modal-content">
+            <h3>Optimized for iPhone Safari</h3>
+            <p>This workout tracker is designed and optimized for an app-like experience on iPhone using Safari.</p>
+            <p>While it may work on your current device/browser, the full experience and app-like features are best on iPhone Safari.</p>
+            <button id="dismissNonIosPromptBtn" style="background: linear-gradient(to right, #00b09b, #96c93d);">Continue Anyway</button>
+        </div>
     </div>
 
     <script>
@@ -769,6 +729,8 @@
         const dismissPromptBtn = document.getElementById('dismissPromptBtn');
         const openInSafariPrompt = document.getElementById('openInSafariPrompt');
         const dismissSafariPromptBtn = document.getElementById('dismissSafariPromptBtn');
+        const nonIosPrompt = document.getElementById('nonIosPrompt'); // New element
+        const dismissNonIosPromptBtn = document.getElementById('dismissNonIosPromptBtn'); // New button
         
         // State variables
         let timer = null; // For set timer
@@ -831,6 +793,8 @@
             dismissPromptBtn.addEventListener('click', dismissAddToHomeScreenPrompt);
             // "Open in Safari" prompt dismissal
             dismissSafariPromptBtn.addEventListener('click', dismissOpenInSafariPrompt);
+            // New: "Non-iOS" prompt dismissal
+            dismissNonIosPromptBtn.addEventListener('click', dismissNonIosPrompt);
             
             // Initialize content displays for current state
             updateSetsDisplay();
@@ -1583,13 +1547,13 @@
             // Check if the user has dismissed it before
             const dismissed = localStorage.getItem('addToHomeScreenDismissed');
             if (!dismissed) {
-                addToHomeScreenPrompt.style.display = 'block';
+                addToHomeScreenPrompt.classList.add('show'); // Use class to show/hide with transitions
             }
         }
 
         // Dismiss the "Add to Home Screen" prompt and remember the choice
         function dismissAddToHomeScreenPrompt() {
-            addToHomeScreenPrompt.style.display = 'none';
+            addToHomeScreenPrompt.classList.remove('show');
             localStorage.setItem('addToHomeScreenDismissed', 'true'); // Remember user preference
         }
 
@@ -1598,14 +1562,28 @@
             // Check if the user has dismissed it before
             const dismissed = localStorage.getItem('openInSafariDismissed');
             if (!dismissed) {
-                 openInSafariPrompt.style.display = 'block';
+                 openInSafariPrompt.classList.add('show'); // Use class to show/hide with transitions
             }
         }
 
         // Dismiss the "Open in Safari" prompt and remember the choice
         function dismissOpenInSafariPrompt() {
-            openInSafariPrompt.style.display = 'none';
+            openInSafariPrompt.classList.remove('show');
             localStorage.setItem('openInSafariDismissed', 'true'); // Remember user preference
+        }
+
+        // New: Show the "Non-iOS" prompt
+        function showNonIosPrompt() {
+            const dismissed = localStorage.getItem('nonIosPromptDismissed');
+            if (!dismissed) {
+                nonIosPrompt.classList.add('show'); // Use class to show/hide with transitions
+            }
+        }
+
+        // New: Dismiss the "Non-iOS" prompt and remember the choice
+        function dismissNonIosPrompt() {
+            nonIosPrompt.classList.remove('show');
+            localStorage.setItem('nonIosPromptDismissed', 'true'); // Remember user preference
         }
 
         // Main function to check browser and display appropriate prompt
@@ -1623,8 +1601,10 @@
                     // iOS + NOT Safari -> Recommend opening in Safari
                     showOpenInSafariPrompt();
                 }
+            } else {
+                // Not an iOS device (Android, Windows, Mac, etc.) -> Show general non-iOS prompt
+                showNonIosPrompt();
             }
-            // For non-iOS devices, do nothing.
         }
         
         // Initialize the app when the script loads
