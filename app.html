@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Workout Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* General styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+            color: white;
+            min-height: 100vh;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(10, 15, 35, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            overflow: hidden;
+            padding: 20px;
+            position: relative;
+        }
+        
+        /* Header styles */
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .subtitle {
+            color: #a0a0d0;
+            font-size: 1rem;
+        }
+        
+        /* Timer container styles */
+        .timer-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin: 15px 0;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            position: relative;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        #timer {
+            font-size: 4rem;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 3px;
+            margin: 10px 0;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+        
+        .timer-label {
+            font-size: 1.2rem;
+            color: #b0b0ff;
+            margin-top: 10px;
+        }
+        
+        .progress-container {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            width: 0%;
+            transition: width 0.5s;
+        }
+        
+        .rest-notice {
+            text-align: center;
+            color: #ffb347;
+            margin: 10px 0;
+            font-style: italic;
+            font-size: 1rem;
+        }
+        
+        .timer-state {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 10px;
+            border-radius: 20px;
+            color: #ffb347;
+        }
+        
+        /* Workout info styles */
+        .workout-info {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .info-box {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .info-label {
+            font-size: 0.9rem;
+            color: #b0b0ff;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        
+        /* Control buttons styles */
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 20px 0;
+        }
+        
+        button {
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        
+        button i {
+            font-size: 1.4rem;
+        }
+        
+        #toggleSetBtn {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+            grid-column: 1 / -1;
+        }
+        
+        #toggleSetBtn.running {
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+        }
+        
+        #toggleSetBtn:hover {
+            transform: translateY(-2px);
+        }
+        
+        #nextExerciseBtn {
+            background: linear-gradient(to right, #4A00E0, #8E2DE2);
+        }
+        
+        #nextExerciseBtn:hover {
+            background: linear-gradient(to right, #4200c9, #7d26c9);
+            transform: translateY(-2px);
+        }
+        
+        #endWorkoutBtn {
+            background: linear-gradient(to right, #1D2B64, #F8CDDA);
+            grid-column: 1 / -1;
+        }
+        
+        #endWorkoutBtn:hover {
+            background: linear-gradient(to right, #172350, #e0bdc7);
+            transform: translateY(-2px);
+        }
+        
+        /* Current Set display styles */
+        .current-set {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .set-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .set-title {
+            font-weight: 700;
+            color: #ffb347;
+        }
+        
+        .set-time {
+            font-family: 'Courier New', monospace;
+        }
+        
+        .sets-container {
+            margin-top: 10px;
+        }
+        
+        .set-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Tabs styles */
+        .tabs {
+            display: flex;
+            margin: 20px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-weight: 600;
+        }
+        
+        .tab.active {
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+        }
+        
+        /* Content areas for tabs */
+        .content {
+            display: none;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            margin-top: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .content.active {
+            display: block;
+        }
+        
+        .history-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+            animation: fadeIn 0.5s ease-out; /* Add fade-in effect */
+        }
+        
+        .history-date {
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #ffb347;
+        }
+        
+        .history-exercise {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .exercise-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .exercise-tag {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .history-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Responsive grid */
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .stat-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #ffb347;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #b0b0ff;
+        }
+        
+        /* Empty state message */
+        .empty-state {
+            text-align: center;
+            padding: 20px;
+            color: #a0a0d0;
+        }
+        
+        /* Footer styles */
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            color: #a0a0d0;
+            font-size: 0.9rem;
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: rgba(20, 25, 45, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+        
+        .modal h3 {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            color: #ffb347;
+        }
+        
+        #exerciseModalInput {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+        
+        #exerciseModalInput:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #ff7e5f;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        #confirmExercise {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+            color: white;
+        }
+        
+        #cancelExercise {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            justify-content: center; /* Center suggestions */
+            margin-bottom: 20px; /* Space before buttons */
+        }
+        
+        .suggestion {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .suggestion:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+                border-radius: 15px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            #timer {
+                font-size: 3.2rem;
+            }
+            
+            button {
+                padding: 14px;
+                font-size: 1rem;
+            }
+            
+            .workout-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .modal-content {
+                padding: 20px;
+            }
+             .history-stats {
+                grid-template-columns: 1fr; /* Stack stats boxes on small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-dumbbell"></i> Workout Tracker</h1>
+            <p class="subtitle">Track sets, rest time, and progress</p>
+        </header>
+        
+        <div class="timer-container">
+            <div class="timer-state" id="timerState">SET TIMER</div>
+            <div id="timer">00:00:00</div>
+            <div class="timer-label" id="timerLabel">CURRENT SET TIMER</div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="rest-notice" id="restNotice" style="display: none;">Rest until next set begins</div>
+        </div>
+        
+        <div class="workout-info">
+            <div class="info-box">
+                <div class="info-label">EXERCISE</div>
+                <div class="info-value" id="exerciseName">-</div>
+            </div>
+            <div class="info-box">
+                <div class="info-label">SET</div>
+                <div class="info-value" id="setNumber">1</div>
+            </div>
+            <div class="info-box">
+                <div class="info-label">WORKOUT TIME</div>
+                <div class="info-value" id="workoutTime">00:00</div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="toggleSetBtn">
+                <i class="fas fa-play"></i> START SET
+            </button>
+            <button id="nextExerciseBtn">
+                <i class="fas fa-arrow-right"></i> NEXT EXERCISE
+            </button>
+            <button id="endWorkoutBtn">
+                <i class="fas fa-flag-checkered"></i> END WORKOUT
+            </button>
+        </div>
+        
+        <div class="current-set">
+            <div class="set-header">
+                <div class="set-title">Current Exercise Sets</div>
+                <div class="set-time">Time</div>
+            </div>
+            <div class="sets-container" id="setsContainer">
+                <div class="empty-state">No sets recorded yet</div>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="today">Current</div>
+            <div class="tab" data-tab="history">History</div>
+            <div class="tab" data-tab="stats">Statistics</div>
+        </div>
+        
+        <div class="content active" id="todayContent">
+            <h3>Today's Workout</h3>
+            <div id="todayWorkout">
+                <div class="empty-state">No workout recorded today</div>
+            </div>
+        </div>
+        
+        <div class="content" id="historyContent">
+            <h3>Workout History</h3>
+            <div id="historyList">
+                <div class="empty-state">No workout history available</div>
+            </div>
+        </div>
+        
+        <div class="content" id="statsContent">
+            <h3>Your Statistics</h3>
+            <div id="statisticsContent">
+                <div class="empty-state">Complete a workout to see stats</div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Data saved in your browser | Start tracking your workout now</p>
+        </div>
+    </div>
+    
+    <!-- Exercise Modal -->
+    <div class="modal" id="exerciseModal">
+        <div class="modal-content">
+            <h3>Enter Exercise Name</h3>
+            <input type="text" id="exerciseModalInput" placeholder="Type exercise name..." autocomplete="off">
+            
+            <div class="suggestions" id="suggestions">
+                <div class="suggestion" data-exercise="Bench Press">Bench Press</div>
+                <div class="suggestion" data-exercise="Squats">Squats</div>
+                <div class="suggestion" data-exercise="Deadlifts">Deadlifts</div>
+                <div class="suggestion" data-exercise="Shoulder Press">Shoulder Press</div>
+                <div class="suggestion" data-exercise="Pull-ups">Pull-ups</div>
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="modal-btn" id="cancelExercise">Cancel</button>
+                <button class="modal-btn" id="confirmExercise">Start Exercise</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const timerDisplay = document.getElementById('timer');
+        const timerLabel = document.getElementById('timerLabel');
+        const timerState = document.getElementById('timerState');
+        const restNotice = document.getElementById('restNotice');
+        const toggleSetBtn = document.getElementById('toggleSetBtn');
+        const nextExerciseBtn = document.getElementById('nextExerciseBtn');
+        const endWorkoutBtn = document.getElementById('endWorkoutBtn');
+        const progressBar = document.getElementById('progressBar');
+        const exerciseName = document.getElementById('exerciseName');
+        const setNumber = document.getElementById('setNumber');
+        const workoutTime = document.getElementById('workoutTime');
+        const setsContainer = document.getElementById('setsContainer');
+        const tabs = document.querySelectorAll('.tab');
+        const contents = document.querySelectorAll('.content');
+        const todayWorkout = document.getElementById('todayWorkout');
+        const historyList = document.getElementById('historyList');
+        const statisticsContent = document.getElementById('statisticsContent');
+        const exerciseModal = document.getElementById('exerciseModal');
+        const exerciseModalInput = document.getElementById('exerciseModalInput');
+        const confirmExerciseBtn = document.getElementById('confirmExercise');
+        const cancelExerciseBtn = document.getElementById('cancelExercise');
+        const suggestions = document.getElementById('suggestions');
+        
+        // State variables
+        let timer = null; // For set timer
+        let restTimer = null; // For rest timer
+        let startTime = null; // For set timer's start time
+        let elapsedTime = 0; // Duration of the current set
+        let restStartTime = null; // For rest timer's start time
+        let restElapsedTime = 0; // Duration of the current rest
+        let workoutStartTime = null; // Overall workout start time
+        let workoutElapsedTime = 0; // Overall workout duration
+        let currentExercise = "";
+        let currentSet = 1;
+        let isTimerRunning = false; // Is set timer running?
+        let isResting = false; // Is rest timer running?
+        let exerciseSets = []; // Stores durations of completed sets for the current exercise
+        let restPeriods = []; // Stores durations of rest periods between sets
+        let allExercises = ["Bench Press", "Squats", "Deadlifts", "Shoulder Press", "Pull-ups"];
+        let workoutHistory = [];
+        let currentWorkout = {
+            exercises: [],
+            startTime: null,
+            endTime: null
+        };
+        
+        // Initialize the app when the DOM is fully loaded
+        function init() {
+            // Load data from localStorage
+            loadData();
+            
+            // Set initial display
+            updateTimerDisplay(elapsedTime);
+            updateWorkoutTimeDisplay();
+            setNumber.textContent = currentSet;
+            
+            // Set event listeners for control buttons
+            toggleSetBtn.addEventListener('click', toggleSet);
+            nextExerciseBtn.addEventListener('click', nextExercise);
+            endWorkoutBtn.addEventListener('click', endWorkout);
+            
+            // Modal event listeners
+            confirmExerciseBtn.addEventListener('click', confirmExercise);
+            cancelExerciseBtn.addEventListener('click', closeModal);
+            
+            // Suggestion click handlers (for modal suggestions)
+            document.querySelectorAll('.suggestion').forEach(suggestion => {
+                suggestion.addEventListener('click', () => {
+                    exerciseModalInput.value = suggestion.getAttribute('data-exercise');
+                });
+            });
+            
+            // Tab navigation event listeners
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.getAttribute('data-tab');
+                    switchTab(tabName);
+                });
+            });
+            
+            // Initialize content displays for current state
+            updateSetsDisplay();
+            updateHistoryDisplay();
+            updateStatsDisplay();
+            updateTodayWorkoutDisplay(); // Ensure today's workout is displayed on load
+        }
+        
+        // Load data from localStorage upon initialization
+        function loadData() {
+            const savedExercises = localStorage.getItem('exercises');
+            if (savedExercises) {
+                allExercises = JSON.parse(savedExercises);
+                updateSuggestions(); // Update suggestions based on loaded exercises
+            }
+            
+            const savedHistory = localStorage.getItem('workoutHistory');
+            if (savedHistory) {
+                workoutHistory = JSON.parse(savedHistory);
+            }
+
+            const savedWorkoutData = localStorage.getItem('workoutData');
+            if (savedWorkoutData) {
+                const data = JSON.parse(savedWorkoutData);
+                currentExercise = data.currentExercise || "";
+                currentSet = data.currentSet || 1;
+                exerciseSets = data.exerciseSets || [];
+                restPeriods = data.restPeriods || []; // Use restPeriods here
+                workoutStartTime = data.workoutStartTime;
+                workoutElapsedTime = data.workoutElapsedTime || 0;
+                isResting = data.isResting || false;
+                restElapsedTime = data.restElapsedTime || 0;
+                currentWorkout = data.currentWorkout || { exercises: [], startTime: null, endTime: null };
+
+                // Restore timer states if app was closed mid-workout/rest
+                if (isResting) {
+                    startRestTimer(); // Restart rest timer if it was active
+                } else if (currentExercise && exerciseSets.length > 0) {
+                    // If there's an ongoing exercise, but not resting, display current set state
+                    updateSetsDisplay(); // Redraw sets from loaded data
+                }
+            }
+            
+            exerciseName.textContent = currentExercise || "-";
+        }
+        
+        // Update the list of exercise suggestions in the modal
+        function updateSuggestions() {
+            suggestions.innerHTML = '';
+            // Display up to 5 most recent or common exercises as suggestions
+            allExercises.slice(0, 5).forEach(ex => {
+                const suggestion = document.createElement('div');
+                suggestion.className = 'suggestion';
+                suggestion.setAttribute('data-exercise', ex);
+                suggestion.textContent = ex;
+                suggestion.addEventListener('click', () => {
+                    exerciseModalInput.value = ex;
+                });
+                suggestions.appendChild(suggestion);
+            });
+        }
+        
+        // Save current workout data to localStorage
+        function saveWorkoutData() {
+            const data = {
+                currentExercise,
+                currentSet,
+                exerciseSets,
+                restPeriods, // Use restPeriods here
+                workoutStartTime,
+                workoutElapsedTime,
+                isResting,
+                restElapsedTime,
+                currentWorkout
+            };
+            localStorage.setItem('workoutData', JSON.stringify(data));
+        }
+        
+        // Display the exercise input modal
+        function showExerciseModal() {
+            exerciseModalInput.value = '';
+            exerciseModalInput.focus();
+            exerciseModal.style.display = 'flex';
+        }
+        
+        // Hide the exercise input modal
+        function closeModal() {
+            exerciseModal.style.display = 'none';
+        }
+        
+        // Confirm the entered exercise name and start the workout/exercise
+        function confirmExercise() {
+            const exercise = exerciseModalInput.value.trim();
+            if (exercise) {
+                // Add to allExercises if it's a new exercise
+                if (!allExercises.includes(exercise)) {
+                    allExercises.unshift(exercise); // Add to the beginning
+                    localStorage.setItem('exercises', JSON.stringify(allExercises));
+                    updateSuggestions(); // Refresh suggestions
+                }
+                
+                setCurrentExercise(exercise);
+                closeModal();
+            }
+        }
+        
+        // Set the current exercise and reset related state for a new exercise
+        function setCurrentExercise(exercise) {
+            currentExercise = exercise;
+            exerciseName.textContent = currentExercise;
+            
+            currentSet = 1; // Reset set counter for new exercise
+            setNumber.textContent = currentSet;
+            
+            // Stop any active timers and reset display
+            if (isTimerRunning) {
+                stopSet(false); // Stop without recording this set
+            }
+            if (isResting) {
+                stopRestTimer();
+            }
+            resetMainTimerDisplay(); // Reset the main timer to 00:00:00
+            
+            // Clear sets and rest times for the new exercise
+            exerciseSets = [];
+            restPeriods = [];
+            updateSetsDisplay(); // Refresh the current sets display
+            
+            saveWorkoutData(); // Save the new current exercise
+        }
+        
+        // Toggles between starting and stopping a set
+        function toggleSet() {
+            if (!currentExercise) {
+                showExerciseModal(); // Prompt for exercise name if none is set
+                return;
+            }
+
+            if (isTimerRunning) {
+                stopSet(true); // Stop the set and record it
+            } else {
+                // If currently resting, stop the rest timer before starting a set
+                if (isResting) {
+                    stopRestTimer();
+                }
+                startSet(); // Start a new set
+            }
+            updateTodayWorkoutDisplay(); // Update today's workout on set toggle
+        }
+        
+        // Starts the set timer
+        function startSet() {
+            if (isTimerRunning) return; // Prevent multiple timers
+
+            // Initialize workout start time if this is the very first set
+            if (!workoutStartTime) {
+                workoutStartTime = Date.now();
+                currentWorkout.startTime = new Date().toISOString();
+            }
+            
+            isTimerRunning = true;
+            startTime = Date.now() - elapsedTime; // Resume from pause or start fresh
+
+            // Clear any lingering rest timer
+            if (restTimer) {
+                clearInterval(restTimer);
+                restTimer = null;
+                isResting = false;
+            }
+            elapsedTime = 0; // Reset set timer duration for the new set
+
+            // Update UI for set timer mode
+            timerLabel.textContent = "CURRENT SET TIMER";
+            timerState.textContent = "SET TIMER";
+            restNotice.style.display = "none";
+            progressBar.style.display = "block";
+            toggleSetBtn.innerHTML = '<i class="fas fa-stop"></i> FINISH SET';
+            toggleSetBtn.classList.add('running');
+            
+            timer = setInterval(() => {
+                const now = Date.now();
+                elapsedTime = now - startTime;
+                workoutElapsedTime = now - workoutStartTime;
+                
+                updateTimerDisplay(elapsedTime); // Update main timer display
+                updateWorkoutTimeDisplay(); // Update overall workout time
+                
+                // Update progress bar visuals (up to 60 seconds)
+                const progress = Math.min(100, (elapsedTime / 60000) * 100);
+                progressBar.style.width = `${progress}%`;
+                
+                // Change progress bar color based on time
+                if (progress < 50) {
+                    progressBar.style.background = "linear-gradient(to right, #00b09b, #96c93d)";
+                } else if (progress < 75) {
+                    progressBar.style.background = "linear-gradient(to right, #ff7e5f, #feb47b)";
+                } else {
+                    progressBar.style.background = "linear-gradient(to right, #ff416c, #ff4b2b)";
+                }
+            }, 100);
+        }
+        
+        // Stops the set timer and optionally records the set
+        function stopSet(recordSet = true) {
+            if (!isTimerRunning) return;
+            
+            clearInterval(timer); // Stop the set timer
+            timer = null; // Clear the timer ID
+            isTimerRunning = false;
+            
+            if (recordSet) {
+                saveSet(); // Save the set duration if it's a completed set
+            }
+            
+            elapsedTime = 0; // Reset elapsed time for the next set
+            updateTimerDisplay(0); // Update main timer display to 00:00:00 immediately
+            
+            // Reset button and progress bar
+            toggleSetBtn.innerHTML = '<i class="fas fa-play"></i> START SET';
+            toggleSetBtn.classList.remove('running');
+            progressBar.style.width = "0%";
+            
+            currentSet++; // Increment set number
+            setNumber.textContent = currentSet;
+            
+            if (recordSet) {
+                startRestTimer(); // Start rest timer only if set was recorded
+            }
+        }
+        
+        // Updates the main timer display (for sets or rest)
+        function updateTimerDisplay(ms) {
+            const totalSeconds = Math.floor(ms / 1000);
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            
+            timerDisplay.textContent = 
+                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        // Updates the rest timer display (shows only minutes and seconds)
+        function updateRestTimerDisplay(ms) {
+            const totalSeconds = Math.floor(ms / 1000);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            
+            timerDisplay.textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Resets the main timer display text to 00:00:00
+        function resetMainTimerDisplay() {
+            timerDisplay.textContent = "00:00:00";
+        }
+        
+        // Updates the overall workout time display
+        function updateWorkoutTimeDisplay() {
+            const totalSeconds = Math.floor(workoutElapsedTime / 1000);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            
+            workoutTime.textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        // Starts the rest timer
+        function startRestTimer() {
+            isResting = true;
+            restElapsedTime = 0; // Reset rest duration for new rest period
+            restStartTime = Date.now(); // Record start of rest
+
+            // Clear any lingering set timer
+            if (timer) {
+                clearInterval(timer);
+                timer = null;
+                isTimerRunning = false;
+            }
+            
+            // Update UI for rest timer mode
+            timerLabel.textContent = "REST TIMER";
+            timerState.textContent = "RESTING";
+            restNotice.style.display = "block"; // Show rest message
+            progressBar.style.display = "none"; // Hide progress bar during rest
+            
+            restTimer = setInterval(() => {
+                restElapsedTime = Date.now() - restStartTime;
+                updateRestTimerDisplay(restElapsedTime); // Update main display with rest time
+            }, 100);
+        }
+        
+        // Stops the rest timer
+        function stopRestTimer() {
+            if (!isResting) return;
+            
+            clearInterval(restTimer); // Stop the rest timer
+            restTimer = null; // Clear the timer ID
+            isResting = false;
+            
+            restPeriods.push(Math.floor(restElapsedTime / 1000)); // Save rest duration
+            restElapsedTime = 0; // Reset for next rest period
+            
+            // Switch UI back to set timer mode (but don't start the timer automatically)
+            timerLabel.textContent = "CURRENT SET TIMER";
+            timerState.textContent = "SET TIMER";
+            restNotice.style.display = "none";
+            progressBar.style.display = "block"; // Show progress bar again
+            resetMainTimerDisplay(); // Reset the main timer display to 00:00:00
+        }
+        
+        // Moves to the next exercise, saving the current one if applicable
+        function nextExercise() {
+            // Stop any running timers gracefully (don't record incomplete set)
+            if (isTimerRunning) {
+                stopSet(false); 
+            }
+            if (isResting) {
+                stopRestTimer();
+            }
+
+            // Save the current exercise and its sets/rest periods if data exists
+            if (currentExercise && exerciseSets.length > 0) {
+                currentWorkout.exercises.push({
+                    name: currentExercise,
+                    sets: [...exerciseSets],
+                    restTimes: [...restPeriods] // Use restPeriods here
+                });
+
+                // Add the current exercise to allExercises if it's new
+                if (!allExercises.includes(currentExercise)) {
+                    allExercises.unshift(currentExercise);
+                    localStorage.setItem('exercises', JSON.stringify(allExercises));
+                    updateSuggestions();
+                }
+            }
+            
+            // Reset state variables for the new exercise
+            currentExercise = "";
+            exerciseName.textContent = "-";
+            exerciseSets = [];
+            restPeriods = [];
+            currentSet = 1;
+            setNumber.textContent = currentSet;
+            
+            setsContainer.innerHTML = '<div class="empty-state">No sets recorded yet</div>'; // Clear sets display
+            
+            showExerciseModal(); // Prompt user for the new exercise name
+            
+            saveWorkoutData(); // Save the current (reset) workout state
+            updateTodayWorkoutDisplay(); // Refresh today's workout view
+        }
+        
+        // Ends the entire workout session
+        function endWorkout() {
+            // Stop any active timers (don't record incomplete last set)
+            if (isTimerRunning) {
+                stopSet(false);
+            }
+            if (isResting) {
+                stopRestTimer();
+            }
+
+            // Capture any remaining sets for the current exercise before ending
+            if (currentExercise && exerciseSets.length > 0) {
+                currentWorkout.exercises.push({
+                    name: currentExercise,
+                    sets: [...exerciseSets],
+                    restTimes: [...restPeriods]
+                });
+            }
+            
+            if (currentWorkout.exercises.length > 0) {
+                currentWorkout.endTime = new Date().toISOString();
+                currentWorkout.duration = Math.floor(workoutElapsedTime / 1000); // Total workout duration in seconds
+                
+                workoutHistory.push(currentWorkout); // Add completed workout to history
+                localStorage.setItem('workoutHistory', JSON.stringify(workoutHistory)); // Save history
+                
+                alert("Workout saved! Great job!"); // Confirmation message
+            } else {
+                alert("No workout data to save for this session."); // No data to save
+            }
+            
+            resetWorkout(); // Reset all workout-related state and UI
+            
+            // Update all content displays
+            updateSetsDisplay();
+            updateWorkoutTimeDisplay();
+            updateHistoryDisplay();
+            updateStatsDisplay();
+            updateTodayWorkoutDisplay();
+            
+            // Ensure timer UI is fully reset
+            timerLabel.textContent = "CURRENT SET TIMER";
+            timerState.textContent = "SET TIMER";
+            restNotice.style.display = "none";
+            progressBar.style.display = "block";
+            resetMainTimerDisplay(); // Explicitly set to 00:00:00
+            toggleSetBtn.innerHTML = '<i class="fas fa-play"></i> START SET';
+            toggleSetBtn.classList.remove('running');
+            progressBar.style.width = "0%";
+        }
+        
+        // Resets all workout-related state variables and UI elements
+        function resetWorkout() {
+            // Clear any active timers
+            if (timer) clearInterval(timer);
+            if (restTimer) clearInterval(restTimer);
+            timer = null;
+            restTimer = null;
+            
+            // Reset all state variables
+            startTime = null;
+            elapsedTime = 0;
+            restStartTime = null;
+            restElapsedTime = 0;
+            currentSetTime = 0; 
+            workoutStartTime = null;
+            workoutElapsedTime = 0;
+            currentExercise = "";
+            currentSet = 1;
+            isTimerRunning = false;
+            isResting = false;
+            exerciseSets = [];
+            restPeriods = []; // Use restPeriods here
+            currentWorkout = {
+                exercises: [],
+                startTime: null,
+                endTime: null
+            };
+            
+            // Update UI elements to their initial reset state
+            exerciseName.textContent = "-";
+            setNumber.textContent = currentSet;
+            workoutTime.textContent = "00:00";
+            setsContainer.innerHTML = '<div class="empty-state">No sets recorded yet</div>';
+            resetMainTimerDisplay(); // Ensures the main timer shows 00:00:00
+            timerLabel.textContent = "CURRENT SET TIMER";
+            timerState.textContent = "SET TIMER";
+            restNotice.style.display = "none";
+            progressBar.style.width = "0%";
+            toggleSetBtn.innerHTML = '<i class="fas fa-play"></i> START SET';
+            toggleSetBtn.classList.remove('running');
+
+            localStorage.removeItem('workoutData'); // Clear ongoing workout data from local storage
+        }
+        
+        // Saves the duration of a completed set
+        function saveSet() {
+            // Use elapsedTime directly as it holds the duration of the finished set
+            exerciseSets.push(Math.floor(elapsedTime / 1000)); 
+            updateSetsDisplay();
+            saveWorkoutData();
+        }
+        
+        // Updates the display of current exercise's sets
+        function updateSetsDisplay() {
+            setsContainer.innerHTML = ''; // Clear existing display
+            
+            if (exerciseSets.length === 0) {
+                setsContainer.innerHTML = '<div class="empty-state">No sets recorded yet</div>';
+                return;
+            }
+            
+            exerciseSets.forEach((duration, index) => {
+                const minutes = Math.floor(duration / 60);
+                const seconds = duration % 60;
+                
+                const setElement = document.createElement('div');
+                setElement.className = 'set-item';
+                setElement.innerHTML = `
+                    <div>Set ${index + 1}</div>
+                    <div>${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}</div>
+                `;
+                setsContainer.appendChild(setElement);
+            });
+        }
+        
+        // Updates the workout history display in the 'History' tab
+        function updateHistoryDisplay() {
+            historyList.innerHTML = ''; // Clear history display
+            
+            if (workoutHistory.length === 0) {
+                historyList.innerHTML = '<div class="empty-state">No workout history available</div>';
+                return;
+            }
+            
+            // Display most recent workouts first
+            workoutHistory.slice().reverse().forEach(workout => { 
+                const workoutEl = createWorkoutElement(workout);
+                historyList.appendChild(workoutEl);
+            });
+        }
+
+        // Updates the 'Today's Workout' tab display
+        function updateTodayWorkoutDisplay() {
+            todayWorkout.innerHTML = ''; // Clear today's workout display
+
+            // Display the current workout being tracked if it has exercises or is ongoing
+            if (currentWorkout.exercises.length > 0 || (currentExercise && (isTimerRunning || isResting || exerciseSets.length > 0))) {
+                const tempWorkoutDiv = document.createElement('div');
+                tempWorkoutDiv.className = 'history-item';
+
+                let tempExercisesHtml = '';
+                // Add completed exercises within the current workout
+                currentWorkout.exercises.forEach(ex => {
+                    const totalExerciseTime = ex.sets.reduce((sum, setDuration) => sum + setDuration, 0);
+                    const exMinutes = Math.floor(totalExerciseTime / 60);
+                    const exSeconds = totalExerciseTime % 60;
+                    tempExercisesHtml += `
+                        <div class="history-exercise">
+                            <span>${ex.name} (${ex.sets.length} sets)</span>
+                            <span>${exMinutes.toString().padStart(2, '0')}:${exSeconds.toString().padStart(2, '0')}</span>
+                        </div>
+                        <div class="exercise-list">
+                            ${ex.sets.map((s, i) => `<span class="exercise-tag">Set ${i+1}: ${Math.floor(s/60).toString().padStart(2, '0')}:${(s%60).toString().padStart(2, '0')}</span>`).join('')}
+                        </div>
+                    `;
+                });
+
+                // Add current, ongoing exercise if it exists and has sets
+                if (currentExercise && exerciseSets.length > 0) {
+                    const currentExTotalTime = exerciseSets.reduce((sum, setDuration) => sum + setDuration, 0);
+                    const currentExMinutes = Math.floor(currentExTotalTime / 60);
+                    const currentExSeconds = currentExTotalTime % 60;
+                    tempExercisesHtml += `
+                        <div class="history-exercise">
+                            <span>${currentExercise} (${exerciseSets.length} sets - IN PROGRESS)</span>
+                            <span>${currentExMinutes.toString().padStart(2, '0')}:${currentExSeconds.toString().padStart(2, '0')}</span>
+                        </div>
+                        <div class="exercise-list">
+                            ${exerciseSets.map((s, i) => `<span class="exercise-tag">Set ${i+1}: ${Math.floor(s/60).toString().padStart(2, '0')}:${(s%60).toString().padStart(2, '0')}</span>`).join('')}
+                        </div>
+                    `;
+                }
+
+
+                const overallDuration = Math.floor(workoutElapsedTime / 1000);
+                const overallMinutes = Math.floor(overallDuration / 60);
+                const overallSeconds = overallDuration % 60;
+
+                tempWorkoutDiv.innerHTML = `
+                    <div class="history-date">Current Workout (${overallMinutes.toString().padStart(2, '0')}:${overallSeconds.toString().padStart(2, '0')})</div>
+                    ${tempExercisesHtml || '<div class="empty-state">No exercises started yet in this workout.</div>'}
+                `;
+                todayWorkout.appendChild(tempWorkoutDiv);
+
+            } else {
+                todayWorkout.innerHTML = '<div class="empty-state">No workout recorded today</div>';
+            }
+        }
+        
+        // Helper function to create a workout display element for history/today
+        function createWorkoutElement(workout) {
+            const workoutEl = document.createElement('div');
+            workoutEl.className = 'history-item';
+            
+            const date = new Date(workout.startTime).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            const duration = formatDuration(workout.duration);
+            
+            let exercisesHtml = '';
+            workout.exercises.forEach(exercise => {
+                const totalExerciseTime = exercise.sets.reduce((sum, setDuration) => sum + setDuration, 0);
+                const exMinutes = Math.floor(totalExerciseTime / 60);
+                const exSeconds = Math.floor(totalExerciseTime % 60); // Ensure seconds are floored here
+                
+
+                exercisesHtml += `
+                    <div class="history-exercise">
+                        <span><strong>${exercise.name}</strong> (${exercise.sets.length} sets)</span>
+                        <span>${exMinutes.toString().padStart(2, '0')}:${exSeconds.toString().padStart(2, '0')}</span>
+                    </div>
+                    <div class="exercise-list">
+                        ${exercise.sets.map((setDuration, index) => `<span class="exercise-tag">Set ${index + 1}: ${formatDuration(setDuration)}</span>`).join('')}
+                        ${exercise.restTimes && exercise.restTimes.length > 0 ? exercise.restTimes.map((restDur, index) => `<span class="exercise-tag">Rest ${index + 1}: ${formatDuration(restDur)}</span>`).join('') : ''}
+                    </div>
+                `;
+            });
+            
+            workoutEl.innerHTML = `
+                <div class="history-date">Workout on ${date} (Total: ${duration})</div>
+                ${exercisesHtml}
+            `;
+            
+            return workoutEl;
+        }
+        
+        // Updates the statistics display in the 'Statistics' tab
+        function updateStatsDisplay() {
+            statisticsContent.innerHTML = '';
+            
+            if (workoutHistory.length === 0) {
+                statisticsContent.innerHTML = '<div class="empty-state">Complete a workout to see stats</div>';
+                return;
+            }
+            
+            let totalWorkouts = workoutHistory.length;
+            let totalSets = 0;
+            let totalWorkoutDuration = 0; // in seconds
+            let exerciseCount = {}; // Frequency of each exercise
+            let totalRestTime = 0; // in seconds
+            let restCount = 0;
+            let longestSet = 0;
+            let shortestSet = Infinity;
+            let longestWorkout = 0;
+            
+            workoutHistory.forEach(workout => {
+                totalWorkoutDuration += workout.duration;
+                longestWorkout = Math.max(longestWorkout, workout.duration);
+
+                workout.exercises.forEach(exercise => {
+                    totalSets += exercise.sets.length;
+                    
+                    // Count exercise frequency
+                    exerciseCount[exercise.name] = (exerciseCount[exercise.name] || 0) + 1;
+                    
+                    // Calculate set statistics
+                    exercise.sets.forEach(setDuration => {
+                        longestSet = Math.max(longestSet, setDuration);
+                        shortestSet = Math.min(shortestSet, setDuration);
+                    });
+                    
+                    // Calculate rest times
+                    if (exercise.restTimes && exercise.restTimes.length > 0) {
+                        exercise.restTimes.forEach(rt => {
+                            totalRestTime += rt;
+                            restCount++;
+                        });
+                    }
+                });
+            });
+            
+            // Find most popular exercise
+            let topExercise = "N/A";
+            let maxCount = 0;
+            if (Object.keys(exerciseCount).length > 0) {
+                const sortedExercises = Object.entries(exerciseCount).sort(([, a], [, b]) => b - a);
+                topExercise = sortedExercises[0][0];
+                maxCount = sortedExercises[0][1];
+            }
+            
+            // Calculate averages
+            const avgDurationPerWorkout = totalWorkouts > 0 ? Math.floor(totalWorkoutDuration / totalWorkouts) : 0;
+            // Ensure avgSetTime is floored
+            const avgSetTime = totalSets > 0 ? Math.floor(workoutHistory.reduce((sum, w) => sum + w.exercises.reduce((exSum, ex) => exSum + ex.sets.reduce((setSum, s) => setSum + s, 0), 0), 0) / totalSets) : 0;
+            // Ensure avgRestTime is floored
+            const avgRestTime = restCount > 0 ? Math.floor(totalRestTime / restCount) : 0;
+            
+            // Create stats boxes
+            statisticsContent.innerHTML = `
+                <div class="history-stats">
+                    <div class="stat-box">
+                        <div class="stat-value">${totalWorkouts}</div>
+                        <div class="stat-label">Workouts</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">${totalSets}</div>
+                        <div class="stat-label">Total Sets</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">${formatDuration(totalWorkoutDuration)}</div>
+                        <div class="stat-label">Total Workout Time</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">${topExercise}</div>
+                        <div class="stat-label">Most Used Exercise</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">${formatDuration(avgDurationPerWorkout)}</div>
+                        <div class="stat-label">Avg. Wkt Time</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">${formatDuration(avgSetTime)}</div>
+                        <div class="stat-label">Avg. Set Time</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">${formatDuration(avgRestTime)}</div>
+                        <div class="stat-label">Avg. Rest Time</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">${longestSet > 0 ? formatDuration(longestSet) : '-'}</div>
+                        <div class="stat-label">Longest Set</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">${shortestSet !== Infinity ? formatDuration(shortestSet) : '-'}</div>
+                        <div class="stat-label">Shortest Set</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Helper function to format seconds into MM:SS or HH:MM:SS
+        function formatDuration(seconds) {
+            if (seconds === undefined || seconds === null || isNaN(seconds)) {
+                return "00:00";
+            }
+            // Ensure seconds is an integer before calculating minutes/hours
+            const flooredSeconds = Math.floor(seconds); 
+            const hours = Math.floor(flooredSeconds / 3600);
+            const minutes = Math.floor((flooredSeconds % 3600) / 60);
+            const secs = flooredSeconds % 60;
+
+            if (hours > 0) {
+                return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+            return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        // Handles tab navigation and updates content visibility
+        function switchTab(tabName) {
+            tabs.forEach(tab => tab.classList.remove('active')); // Deactivate all tabs
+            contents.forEach(content => content.classList.remove('active')); // Hide all content
+            
+            document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active'); // Activate clicked tab
+            document.getElementById(`${tabName}Content`).classList.add('active'); // Show corresponding content
+            
+            // Update content dynamically based on selected tab
+            if (tabName === 'history') {
+                updateHistoryDisplay();
+            } else if (tabName === 'stats') {
+                updateStatsDisplay();
+            } else if (tabName === 'today') {
+                updateTodayWorkoutDisplay();
+            }
+        }
+        
+        // Initialize the app when the script loads
+        init();
+    </script>
+</body>
+</html>
