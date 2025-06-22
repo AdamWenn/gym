@@ -91,6 +91,18 @@
             margin-top: 10px;
         }
         
+        /* Fixed: Adjust position of timer-state to prevent overlap */
+        .timer-state {
+            position: absolute;
+            top: 10px; /* Adjusted from 15px */
+            right: 15px; /* Adjusted from 20px */
+            font-size: 0.8rem; /* Slightly reduced font size */
+            background: rgba(255, 255, 255, 0.1);
+            padding: 3px 8px; /* Reduced padding */
+            border-radius: 15px; /* Adjusted border-radius */
+            color: #ffb347;
+        }
+        
         .progress-container {
             height: 8px;
             background: rgba(255, 255, 255, 0.1);
@@ -112,17 +124,6 @@
             margin: 10px 0;
             font-style: italic;
             font-size: 1rem;
-        }
-        
-        .timer-state {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 0.9rem;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 5px 10px;
-            border-radius: 20px;
-            color: #ffb347;
         }
         
         /* Workout info styles */
@@ -497,6 +498,124 @@
                 grid-template-columns: 1fr; /* Stack stats boxes on small screens */
             }
         }
+
+        /* Add to Home Screen Prompt Specific Styles */
+        #addToHomeScreenPrompt {
+            display: none; /* Hidden by default */
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 350px;
+            background: rgba(30, 40, 70, 0.98);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6);
+            color: white;
+            text-align: center;
+            font-size: 0.95rem;
+            z-index: 1000; /* Ensure it's on top */
+            animation: slideInUp 0.5s ease-out;
+            box-sizing: border-box; /* Include padding in width calculation */
+        }
+
+        #addToHomeScreenPrompt p {
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        #addToHomeScreenPrompt .icon-container {
+            margin-bottom: 10px;
+        }
+
+        #addToHomeScreenPrompt .icon-container img {
+            width: 30px; /* Adjust size as needed */
+            height: 30px;
+            vertical-align: middle;
+            margin: 0 5px;
+        }
+
+        #addToHomeScreenPrompt button {
+            background: linear-gradient(to right, #feb47b, #ff7e5f);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            font-weight: 600;
+            width: auto;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        #addToHomeScreenPrompt button:hover {
+            opacity: 0.9;
+        }
+
+        /* "Open in Safari" Prompt Specific Styles */
+        #openInSafariPrompt {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 350px;
+            background: rgba(30, 40, 70, 0.98);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6);
+            color: white;
+            text-align: center;
+            font-size: 1rem;
+            z-index: 1001; /* Higher z-index than add to home screen prompt */
+            box-sizing: border-box;
+        }
+
+        #openInSafariPrompt h3 {
+            margin-bottom: 15px;
+            color: #ffb347;
+            font-size: 1.3rem;
+        }
+
+        #openInSafariPrompt p {
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        #openInSafariPrompt a {
+            color: #feb47b;
+            text-decoration: underline;
+        }
+
+        #openInSafariPrompt button {
+            background: linear-gradient(to right, #4A00E0, #8E2DE2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: none;
+            font-weight: 600;
+            width: auto;
+            margin-top: 10px;
+        }
+
+        #openInSafariPrompt button:hover {
+            opacity: 0.9;
+        }
+
+        /* Keyframe for sliding up animation */
+        @keyframes slideInUp {
+            from {
+                transform: translateX(-50%) translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
@@ -554,15 +673,15 @@
         </div>
         
         <div class="tabs">
-            <div class="tab active" data-tab="today">Today</div>
+            <div class="tab active" data-tab="current">Current</div>
             <div class="tab" data-tab="history">History</div>
             <div class="tab" data-tab="stats">Statistics</div>
         </div>
         
-        <div class="content active" id="todayContent">
-            <h3>Today's Workout</h3>
-            <div id="todayWorkout">
-                <div class="empty-state">No workout recorded today</div>
+        <div class="content active" id="currentContent">
+            <h3>Current Workout</h3>
+            <div id="currentWorkoutDisplay">
+                <div class="empty-state">No workout recorded yet. Start a new exercise!</div>
             </div>
         </div>
         
@@ -606,6 +725,21 @@
         </div>
     </div>
 
+    <!-- Add to Home Screen Prompt -->
+    <div id="addToHomeScreenPrompt">
+        <p>For an app-like experience, add this to your Home Screen!</p>
+        <p>Tap the <span class="icon-container"><img src="https://placehold.co/30x30/FFFFFF/000000?text=%E2%86%91%EF%B8%8F" alt="Share icon"></span> button below and select "<span class="icon-container"><img src="https://placehold.co/30x30/FFFFFF/000000?text=%2B" alt="Add to Home Screen icon"></span> Add to Home Screen".</p>
+        <button id="dismissPromptBtn">Got It!</button>
+    </div>
+
+    <!-- Open in Safari Prompt -->
+    <div id="openInSafariPrompt">
+        <h3>Optimal Experience in Safari</h3>
+        <p>For the best app-like experience on your iPhone, please open this workout tracker in **Safari**.</p>
+        <p>Copy this link and paste it into Safari, or try using your current browser's "Open in Safari" option.</p>
+        <button id="dismissSafariPromptBtn">Understood</button>
+    </div>
+
     <script>
         // DOM Elements
         const timerDisplay = document.getElementById('timer');
@@ -622,7 +756,8 @@
         const setsContainer = document.getElementById('setsContainer');
         const tabs = document.querySelectorAll('.tab');
         const contents = document.querySelectorAll('.content');
-        const todayWorkout = document.getElementById('todayWorkout');
+        // Renamed from todayWorkout to currentWorkoutDisplay for consistency
+        const currentWorkoutDisplay = document.getElementById('currentWorkoutDisplay'); 
         const historyList = document.getElementById('historyList');
         const statisticsContent = document.getElementById('statisticsContent');
         const exerciseModal = document.getElementById('exerciseModal');
@@ -630,6 +765,10 @@
         const confirmExerciseBtn = document.getElementById('confirmExercise');
         const cancelExerciseBtn = document.getElementById('cancelExercise');
         const suggestions = document.getElementById('suggestions');
+        const addToHomeScreenPrompt = document.getElementById('addToHomeScreenPrompt');
+        const dismissPromptBtn = document.getElementById('dismissPromptBtn');
+        const openInSafariPrompt = document.getElementById('openInSafariPrompt');
+        const dismissSafariPromptBtn = document.getElementById('dismissSafariPromptBtn');
         
         // State variables
         let timer = null; // For set timer
@@ -687,12 +826,20 @@
                     switchTab(tabName);
                 });
             });
+
+            // "Add to Home Screen" prompt dismissal
+            dismissPromptBtn.addEventListener('click', dismissAddToHomeScreenPrompt);
+            // "Open in Safari" prompt dismissal
+            dismissSafariPromptBtn.addEventListener('click', dismissOpenInSafariPrompt);
             
             // Initialize content displays for current state
             updateSetsDisplay();
             updateHistoryDisplay();
             updateStatsDisplay();
-            updateTodayWorkoutDisplay(); // Ensure today's workout is displayed on load
+            updateCurrentWorkoutDisplay(); // Ensure current workout is displayed on load
+
+            // Check browser and show appropriate prompt
+            checkBrowserAndPrompt();
         }
         
         // Load data from localStorage upon initialization
@@ -834,7 +981,7 @@
                 }
                 startSet(); // Start a new set
             }
-            updateTodayWorkoutDisplay(); // Update today's workout on set toggle
+            updateCurrentWorkoutDisplay(); // Update current workout on set toggle
         }
         
         // Starts the set timer
@@ -1036,7 +1183,7 @@
             showExerciseModal(); // Prompt user for the new exercise name
             
             saveWorkoutData(); // Save the current (reset) workout state
-            updateTodayWorkoutDisplay(); // Refresh today's workout view
+            updateCurrentWorkoutDisplay(); // Refresh current workout view
         }
         
         // Ends the entire workout session
@@ -1077,7 +1224,7 @@
             updateWorkoutTimeDisplay();
             updateHistoryDisplay();
             updateStatsDisplay();
-            updateTodayWorkoutDisplay();
+            updateCurrentWorkoutDisplay();
             
             // Ensure timer UI is fully reset
             timerLabel.textContent = "CURRENT SET TIMER";
@@ -1181,9 +1328,9 @@
             });
         }
 
-        // Updates the 'Today's Workout' tab display
-        function updateTodayWorkoutDisplay() {
-            todayWorkout.innerHTML = ''; // Clear today's workout display
+        // Updates the 'Current Workout' tab display (renamed from updateTodayWorkoutDisplay)
+        function updateCurrentWorkoutDisplay() {
+            currentWorkoutDisplay.innerHTML = ''; // Clear current workout display
 
             // Display the current workout being tracked if it has exercises or is ongoing
             if (currentWorkout.exercises.length > 0 || (currentExercise && (isTimerRunning || isResting || exerciseSets.length > 0))) {
@@ -1232,14 +1379,14 @@
                     <div class="history-date">Current Workout (${overallMinutes.toString().padStart(2, '0')}:${overallSeconds.toString().padStart(2, '0')})</div>
                     ${tempExercisesHtml || '<div class="empty-state">No exercises started yet in this workout.</div>'}
                 `;
-                todayWorkout.appendChild(tempWorkoutDiv);
+                currentWorkoutDisplay.appendChild(tempWorkoutDiv);
 
             } else {
-                todayWorkout.innerHTML = '<div class="empty-state">No workout recorded today</div>';
+                currentWorkoutDisplay.innerHTML = '<div class="empty-state">No workout recorded yet. Start a new exercise!</div>';
             }
         }
         
-        // Helper function to create a workout display element for history/today
+        // Helper function to create a workout display element for history/current
         function createWorkoutElement(workout) {
             const workoutEl = document.createElement('div');
             workoutEl.className = 'history-item';
@@ -1401,6 +1548,7 @@
             contents.forEach(content => content.classList.remove('active')); // Hide all content
             
             document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active'); // Activate clicked tab
+            // Fixed: changed id from todayContent to currentContent
             document.getElementById(`${tabName}Content`).classList.add('active'); // Show corresponding content
             
             // Update content dynamically based on selected tab
@@ -1408,9 +1556,75 @@
                 updateHistoryDisplay();
             } else if (tabName === 'stats') {
                 updateStatsDisplay();
-            } else if (tabName === 'today') {
-                updateTodayWorkoutDisplay();
+            } else if (tabName === 'current') { /* Fixed: Changed 'today' to 'current' */
+                updateCurrentWorkoutDisplay();
             }
+        }
+
+        // --- iPhone Browser Detection and "Add to Home Screen" Prompt Logic ---
+
+        // Function to detect browser and standalone mode
+        function getBrowserInfo() {
+            const userAgent = navigator.userAgent;
+            const isiOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+            const isSafari = /Safari/.test(userAgent) && !/Chrome|CriOS|FxiOS|EdgiOS/.test(userAgent); // Check for Safari, exclude other known iOS browsers
+            const isStandalone = ('standalone' in window.navigator) && (window.navigator.standalone);
+            const isMediaStandalone = window.matchMedia('(display-mode: standalone)').matches;
+
+            return {
+                isIos: isiOS,
+                isSafari: isSafari,
+                isStandalone: isStandalone || isMediaStandalone // True if already added to home screen
+            };
+        }
+
+        // Show the "Add to Home Screen" prompt
+        function showAddToHomeScreenPrompt() {
+            // Check if the user has dismissed it before
+            const dismissed = localStorage.getItem('addToHomeScreenDismissed');
+            if (!dismissed) {
+                addToHomeScreenPrompt.style.display = 'block';
+            }
+        }
+
+        // Dismiss the "Add to Home Screen" prompt and remember the choice
+        function dismissAddToHomeScreenPrompt() {
+            addToHomeScreenPrompt.style.display = 'none';
+            localStorage.setItem('addToHomeScreenDismissed', 'true'); // Remember user preference
+        }
+
+        // Show the "Open in Safari" prompt
+        function showOpenInSafariPrompt() {
+            // Check if the user has dismissed it before
+            const dismissed = localStorage.getItem('openInSafariDismissed');
+            if (!dismissed) {
+                 openInSafariPrompt.style.display = 'block';
+            }
+        }
+
+        // Dismiss the "Open in Safari" prompt and remember the choice
+        function dismissOpenInSafariPrompt() {
+            openInSafariPrompt.style.display = 'none';
+            localStorage.setItem('openInSafariDismissed', 'true'); // Remember user preference
+        }
+
+        // Main function to check browser and display appropriate prompt
+        function checkBrowserAndPrompt() {
+            const browserInfo = getBrowserInfo();
+
+            if (browserInfo.isIos) {
+                if (browserInfo.isSafari) {
+                    if (!browserInfo.isStandalone) {
+                        // iOS + Safari + NOT standalone -> Recommend Add to Home Screen
+                        showAddToHomeScreenPrompt();
+                    }
+                    // If it is standalone, do nothing (it's already acting as an app)
+                } else {
+                    // iOS + NOT Safari -> Recommend opening in Safari
+                    showOpenInSafariPrompt();
+                }
+            }
+            // For non-iOS devices, do nothing.
         }
         
         // Initialize the app when the script loads
